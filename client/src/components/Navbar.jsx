@@ -1,17 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout } = useAuthContext();
+  const location = useLocation();
 
   return (
     <nav>
       <Link to="/">Home</Link>
+      {user && location.pathname !== '/dashboard' ? (
+        <Link to="/dashboard">Dashboard</Link>
+      ) : null}
+
       {user ? (
         <>
           <span>Welcome, {user.username}</span>
-          <Link to="/dashboard">Dashboard</Link>
           <button onClick={logout}>Logout</button>
         </>
       ) : (

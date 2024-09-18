@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate} from 'react-router-dom';
 import api from '../services/api';
 
 const ProjectEditor = () => {
-  const [project, setProject] = useState({ name: '', content: '' });
+  const [project, setProject] = useState({ name: '', description: '', content: '' });
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
@@ -16,7 +16,8 @@ const ProjectEditor = () => {
   const fetchProject = async () => {
     try {
       const response = await api.get(`/projects/${id}`);
-      setProject({ name: data.name, description: data.description, content: data.content });
+      const { name, description, content } = response.data; // Destructure the data
+      setProject({ name, description, content });
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
       const statusCode = error.response?.data?.statusCode || 500;
@@ -46,38 +47,42 @@ const ProjectEditor = () => {
     try {
       await api.put(`/projects/${id}`, project);
       alert('Project details updated successfully');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Error updating project:', error);
       alert('Failed to update project details');
     }
   };
 
-  const handleEditContent = () => {
-    history.push(`/project/${id}`); //Redirecting ProjectPage.jsx
-  };
-
   return (
     <div>
       <h2>Edit Project</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          value={project.name}
-          onChange={handleChange}
-          placeholder="Project Name"
-          required
-        />
-        <textarea
-          name="description"
-          value={project.description}
-          onChange={handleChange}
-          placeholder="Project Description"
-          required
-        />
+        <div>
+          <label htmlFor="name">Project Name:</label>
+          <input
+            id="name"
+            type="text"
+            name="name"
+            value={project.name}
+            onChange={handleChange}
+            placeholder="Enter project name"
+          // required
+          />
+        </div>
+        <div>
+          <label htmlFor="description">Project Description:</label>
+          <textarea
+            id="description"
+            name="description"
+            value={project.description}
+            onChange={handleChange}
+            placeholder="Enter project description"
+          // required
+          />
+        </div>
         <button type="submit">Save Changes</button>
       </form>
-      <button onClick={handleEditContent}>Edit Content</button>
     </div>
   );
 };

@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import api from '../services/api';
 
 const CreateProject = () => {
   const [name, setName] = useState('');
   const [description , setDescription] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await api.post('/projects', { name, description });
-      history.push(`/project/${response.data._id}`);  //Redirecting ProjectPage.jsx
+      navigate(`/project/${response.data._id}`, { replace: true }); //Redirecting ProjectPage.jsx
+
     } catch (error) {
       console.error('Error creating project:', error);
       const errorMessage = error.response?.data?.message || 'An unexpected error occurred';

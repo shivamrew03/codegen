@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { signup } = useAuthContext();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await signup(username, password);
-      history.push('/login');
+      navigate('/login', { replace: true });
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
       const statusCode = error.response?.data?.statusCode || 500;

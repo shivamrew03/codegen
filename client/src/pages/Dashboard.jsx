@@ -13,10 +13,7 @@ const Dashboard = () => {
     try {
       const response = await api.get('/projects');
       setProjects(response.data);
-    } 
-    // catch (error) {
-    //   console.error('Error fetching projects:', error);
-    // }
+    }
     catch (error) {
       const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
       const statusCode = error.response?.data?.statusCode || 500;
@@ -39,12 +36,16 @@ const Dashboard = () => {
 
   const deleteProject = async (id) => {
     try {
-      await api.delete(`/projects/${id}`);
+      !confirm('Are you sure you want to delete this project?')
+        ? null
+        : await api.delete(`/projects/${id}`);
+
       fetchProjects();
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
       const statusCode = error.response?.data?.statusCode || 500;
       console.error('Error deleting project:', error);
+
       switch (statusCode) {
         case 400:
           alert(`Bad Request: ${errorMessage}`);
@@ -61,6 +62,7 @@ const Dashboard = () => {
     }
   };
 
+
   return (
     <div>
       <h1>Your Projects</h1>
@@ -68,9 +70,11 @@ const Dashboard = () => {
       <ul>
         {projects.map((project) => (
           <li key={project._id}>
-            {project.name}
-            <Link to={`/project/${project._id}`}>Edit</Link>
-            <button onClick={() => deleteProject(project._id)}>Delete</button>
+            <Link to={`/project/${project._id}`} > {project.name} </Link>
+            <Link to={`/project/${project._id}/edit`}>
+              <button style={{ cursor: 'pointer' }}>Edit Info</button>
+            </Link>
+            <button onClick={() => deleteProject(project._id)}> Delete </button>
           </li>
         ))}
       </ul>
@@ -79,4 +83,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
- 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import { useHistory } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
 import {useNavigate} from 'react-router-dom';
 
@@ -7,20 +6,21 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuthContext();
-  // const history = useHistory();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await login(username, password);
-      // history.push('/dashboard'); //gives a option to go back to the previous page
+      // console.log(response);
+      alert(response.message);
       navigate('/dashboard', { replace: true });
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-      const statusCode = error.response?.data?.statusCode || 500;
-      console.error("Login error: ", error);
-      switch (statusCode) {   
+      console.error(error.status);
+      const errorMessage = error.message || 'An unexpected error occurred';
+      const statusCode = error.statusCode || 500;
+    
+      switch (statusCode) {
         case 400:
           alert(`Bad Request: ${errorMessage}`);
           break;

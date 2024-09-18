@@ -14,8 +14,8 @@ const Signup = () => {
       const response = await signup(username, password);
       navigate('/login', { replace: true });
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-      const statusCode = error.response?.data?.statusCode || 500;
+      const errorMessage = error.message || 'An unexpected error occurred';
+      const statusCode = error.statusCode || 500;
       console.log("sign Up error: ", error);
       switch (statusCode) {
         case 400:

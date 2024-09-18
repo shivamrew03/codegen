@@ -15,8 +15,8 @@ const Dashboard = () => {
       setProjects(response.data);
     }
     catch (error) {
-      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-      const statusCode = error.response?.data?.statusCode || 500;
+      const errorMessage = error.message || 'An unexpected error occurred';
+      const statusCode = error.statusCode || 500;
       console.error('Error fetching projects:', error);
       switch (statusCode) {
         case 400:
@@ -42,8 +42,8 @@ const Dashboard = () => {
 
       fetchProjects();
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-      const statusCode = error.response?.data?.statusCode || 500;
+      const errorMessage = error.message || 'An unexpected error occurred';
+      const statusCode = error.statusCode || 500;
       console.error('Error deleting project:', error);
 
       switch (statusCode) {

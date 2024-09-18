@@ -19,8 +19,8 @@ const ProjectEditor = () => {
       const { name, description, content } = response.data; // Destructure the data
       setProject({ name, description, content });
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-      const statusCode = error.response?.data?.statusCode || 500;
+      const errorMessage = error.message || 'An unexpected error occurred';
+      const statusCode = error.statusCode || 500;
       console.error('Error fetching project:', error);
       switch (statusCode) {
         case 400:

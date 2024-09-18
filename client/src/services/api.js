@@ -9,7 +9,9 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response.status === 401) {
-            // Handle unauthorized access (e.g., redirect to login)
+            const { logout } = useAuthContext();
+            logout();
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }

@@ -11,10 +11,26 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(username, password);
+      const response = await login(username, password);
+      // alert(response.message);
       history.push('/dashboard');
     } catch (error) {
-      console.error('Login failed:', error);
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
+      console.error("Login error: ", error);
+      switch (statusCode) {
+        case 400:
+          alert(`Bad Request: ${errorMessage}`);
+          break;
+        case 401:
+          alert(`Unauthorized: ${errorMessage}`);
+          break;
+        case 404:
+          alert(`Not Found: ${errorMessage}`);
+          break;
+        default:
+          alert(`Error: ${errorMessage}`);
+      }
     }
   };
 
@@ -40,4 +56,3 @@ const Login = () => {
 };
 
 export default Login;
- 

@@ -24,7 +24,7 @@ export const getProject = async (projectId, userId) => {
 export const updateProject = async (projectId, userId, projectData) => {
   const project = await Project.findOneAndUpdate(
     { _id: projectId, user: userId },
-    projectData,
+    { $set: projectData },
     { new: true, runValidators: true }
   );
   if (!project) {
@@ -32,7 +32,6 @@ export const updateProject = async (projectId, userId, projectData) => {
   }
   return project;
 };
-
 export const deleteProject = async (projectId, userId) => {
   const project = await Project.findOneAndDelete({ _id: projectId, user: userId });
   if (!project) {

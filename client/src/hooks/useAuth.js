@@ -21,18 +21,29 @@ export const useAuth = () => {
     };
 
     const login = async (username, password) => {
-        const response = await api.post('/auth/login', { username, password });
-        setUser(response.data.user);
+        try {
+            const response = await api.post('/auth/login', { username, password });
+            setUser(response.data.user);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error;
+        }
     };
 
     const logout = async () => {
-        await api.post('/auth/logout');
+        const response = await api.post('/auth/logout');
         setUser(null);
+        // return response.data;
     };
 
     const signup = async (username, password) => {
-        await api.post('/auth/signup', { username, password });
+        try{
+            const response = await api.post('/auth/signup', { username, password });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error;
+        }
     };
 
-    return { user, loading, login, logout, signup };
+    return { user, loading, login, logout, signup, checkAuth };
 };

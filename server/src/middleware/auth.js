@@ -11,7 +11,7 @@ const authMiddleware = (req, res, next) => {
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    next(new UnauthorizedError('Invalid or expired token'));
+    next(new UnauthorizedError('Invalid token'));
   }
 };
 

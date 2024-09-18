@@ -11,10 +11,25 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signup(username, password);
+      const response = await signup(username, password);
       history.push('/login');
     } catch (error) {
-      console.error('Signup failed:', error);
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
+      console.log("sign Up error: ", error);
+      switch (statusCode) {
+        case 400:
+          alert(`Bad Request: ${errorMessage}`);
+          break;
+        case 401:
+          alert(`Unauthorized: ${errorMessage}`);
+          break;
+        case 404:
+          alert(`Not Found: ${errorMessage}`);
+          break;
+        default:
+          alert(`Error: ${errorMessage}`);
+      }
     }
   };
 
@@ -40,4 +55,3 @@ const Signup = () => {
 };
 
 export default Signup;
- 

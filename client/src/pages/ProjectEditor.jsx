@@ -16,45 +16,70 @@ const ProjectEditor = () => {
   const fetchProject = async () => {
     try {
       const response = await api.get(`/projects/${id}`);
-      setProject(response.data);
+      setProject({ name: data.name, description: data.description, content: data.content });
     } catch (error) {
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
       console.error('Error fetching project:', error);
+      switch (statusCode) {
+        case 400:
+          alert(`Bad Request: ${errorMessage}`);
+          break;
+        case 401:
+          alert(`Unauthorized: ${errorMessage}`);
+          break;
+        case 404:
+          alert(`Not Found: ${errorMessage}`);
+          break;
+        default:
+          alert(`Error: ${errorMessage}`);
+      }
     }
+  };
+
+  const handleChange = (e) => {
+    setProject({ ...project, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (id) {
-        await api.put(`/projects/${id}`, project);
-      } else {
-        await api.post('/projects', project);
-      }
-      history.push('/dashboard');
+      await api.put(`/projects/${id}`, project);
+      alert('Project details updated successfully');
     } catch (error) {
-      console.error('Error saving project:', error);
+      console.error('Error updating project:', error);
+      alert('Failed to update project details');
     }
   };
 
+  const handleEditContent = () => {
+    history.push(`/project/${id}`); //Redirecting ProjectPage.jsx
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={project.name}
-        onChange={(e) => setProject({ ...project, name: e.target.value })}
-        placeholder="Project Name"
-        required
-      />
-      <textarea
-        value={project.content}
-        onChange={(e) => setProject({ ...project, content: e.target.value })}
-        placeholder="Project Content"
-        required
-      />
-      <button type="submit">Save Project</button>
-    </form>
+    <div>
+      <h2>Edit Project</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          value={project.name}
+          onChange={handleChange}
+          placeholder="Project Name"
+          required
+        />
+        <textarea
+          name="description"
+          value={project.description}
+          onChange={handleChange}
+          placeholder="Project Description"
+          required
+        />
+        <button type="submit">Save Changes</button>
+      </form>
+      <button onClick={handleEditContent}>Edit Content</button>
+    </div>
   );
 };
 
 export default ProjectEditor;
- 

@@ -13,8 +13,27 @@ const Dashboard = () => {
     try {
       const response = await api.get('/projects');
       setProjects(response.data);
-    } catch (error) {
+    } 
+    // catch (error) {
+    //   console.error('Error fetching projects:', error);
+    // }
+    catch (error) {
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
       console.error('Error fetching projects:', error);
+      switch (statusCode) {
+        case 400:
+          alert(`Bad Request: ${errorMessage}`);
+          break;
+        case 401:
+          alert(`Unauthorized: ${errorMessage}`);
+          break;
+        case 404:
+          alert(`Not Found: ${errorMessage}`);
+          break;
+        default:
+          alert(`Error: ${errorMessage}`);
+      }
     }
   };
 
@@ -23,14 +42,29 @@ const Dashboard = () => {
       await api.delete(`/projects/${id}`);
       fetchProjects();
     } catch (error) {
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
       console.error('Error deleting project:', error);
+      switch (statusCode) {
+        case 400:
+          alert(`Bad Request: ${errorMessage}`);
+          break;
+        case 401:
+          alert(`Unauthorized: ${errorMessage}`);
+          break;
+        case 404:
+          alert(`Not Found: ${errorMessage}`);
+          break;
+        default:
+          alert(`Error: ${errorMessage}`);
+      }
     }
   };
 
   return (
     <div>
       <h1>Your Projects</h1>
-      <Link to="/project">Create New Project</Link>
+      <Link to="/project/new">Create New Project</Link>
       <ul>
         {projects.map((project) => (
           <li key={project._id}>

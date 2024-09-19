@@ -3,7 +3,7 @@ import { UnauthorizedError } from '../utils/errors.js';
 
 const authMiddleware = (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies?.token;
     if (!token) {
       throw new UnauthorizedError('Authentication required');
     }

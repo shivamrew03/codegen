@@ -2,12 +2,14 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { BadRequestError, UnauthorizedError } from '../utils/errors.js';
+import { validatePassword } from './validatePassword.js';
 
 export const signup = async (username, password) => {
   const existingUser = await User.findOne({ username });
   if (existingUser) {
     throw new BadRequestError('Username already exists');
   }
+  validatePassword(password);
   const user = new User({ username, password });
   await user.save();
   return user;

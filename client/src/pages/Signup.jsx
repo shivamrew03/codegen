@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
+import { validatePassword } from '../services/validatePassword';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const { signup } = useAuthContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (passwordError) {
+      alert(passwordError);
+      return;
+    }
     try {
       const response = await signup(username, password);
       navigate('/login', { replace: true });
@@ -33,6 +39,12 @@ const Signup = () => {
     }
   };
 
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordError(validatePassword(newPassword));
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <input
@@ -45,11 +57,12 @@ const Signup = () => {
       <input
         type="password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={handlePasswordChange}
         placeholder="Password"
         required
       />
-      <button type="submit">Sign Up</button>
+      {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>}
+      <button type="submit" disabled={!!passwordError}>Sign Up</button>
     </form>
   );
 };

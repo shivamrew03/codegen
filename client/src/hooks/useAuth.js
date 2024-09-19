@@ -13,6 +13,7 @@ export const useAuth = () => {
         try {
             const response = await api.get('/auth/me');
             setUser(response.data.user);
+            // console.log(response.data);
         } catch (error) {
             setUser(null);
         } finally {

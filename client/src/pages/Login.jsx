@@ -12,7 +12,6 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await login(username, password);
-      // console.log(response);
       alert(response.message);
       navigate('/dashboard', { replace: true });
     } catch (error) {

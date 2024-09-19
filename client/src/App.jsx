@@ -24,6 +24,7 @@ function App() {
           <PrivateRoute path="/project/new" component={CreateProject} />
           <PrivateRoute path="/project/:id/edit" component={ProjectEditor} />
           <PrivateRoute path="/project/:id" component={ProjectPage} />
+          {/* <Route path="/projecting" component={ProjectPage} /> */}
         </Switch>
       </Router>
     </AuthProvider>

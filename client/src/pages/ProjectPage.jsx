@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import CodeEditor from '../components/CodeEditor';
 import ClassStructure from '../components/ClassStructure';
-import AIAssistant from '../components/AIAssistant';
 import '../styles/ProjectPage.css';
 
 const ProjectPage = () => {
   const [code, setCode] = useState('');
   const [classStructure, setClassStructure] = useState([]);
-  const [language, setLanguage] = useState('javascript');
+  const [language, setLanguage] = useState('cpp');
 
   const handleCodeChange = (newCode) => {
     setCode(newCode);
-  
+    
     // Parse the new code and update the class structure
     const updatedStructure = parseCode(newCode);
     setClassStructure(updatedStructure);
@@ -63,12 +62,12 @@ const ProjectPage = () => {
     setClassStructure([...classStructure, { name: className, parent: parentClass, methods: [], attributes: [] }]);
   };
 
-  const handleAddMethod = (className, methodName, returnType, params, override) => {
+  const handleAddMethod = (className, methodName, returnType, methodType, params, override) => {
     const updatedStructure = classStructure.map(cls => {
       if (cls.name === className) {
         return {
           ...cls,
-          methods: [...cls.methods, { name: methodName, returnType, params, override }]
+          methods: [...cls.methods, { name: methodName, returnType, methodType, params, override }]
         };
       }
       return cls;
@@ -76,12 +75,12 @@ const ProjectPage = () => {
     setClassStructure(updatedStructure);
   };
 
-  const handleAddAttribute = (className, attributeName, attributeType) => {
+  const handleAddAttribute = (className, attributeName, attributeType, initialValue) => {
     const updatedStructure = classStructure.map(cls => {
       if (cls.name === className) {
         return {
           ...cls,
-          attributes: [...cls.attributes, { name: attributeName, type: attributeType }]
+          attributes: [...cls.attributes, { name: attributeName, type: attributeType, initialvalue: initialValue }]
         };
       }
       return cls;
@@ -97,9 +96,9 @@ const ProjectPage = () => {
     <div className="project-page">
       <div className="left-panel">
         <select value={language} onChange={(e) => setLanguage(e.target.value)} className="language-select">
-          <option value="javascript">JavaScript</option>
+          {/* <option value="javascript">JavaScript</option>
           <option value="python">Python</option>
-          <option value="java">Java</option>
+          <option value="java">Java</option> */}
           <option value="cpp">C++</option>
         </select>
         <ClassStructure
@@ -113,7 +112,6 @@ const ProjectPage = () => {
       </div>
       <div className="right-panel">
         <CodeEditor code={code} onChange={handleCodeChange} language={language} />
-        <AIAssistant onSuggest={(suggestion) => setCode(code + suggestion)} language={language} />
       </div>
     </div>
   );

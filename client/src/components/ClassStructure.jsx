@@ -11,6 +11,8 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
   const [newMethodOverride, setNewMethodOverride] = useState(false);
   const [newAttributeName, setNewAttributeName] = useState('');
   const [newAttributeType, setNewAttributeType] = useState('int');
+  const [initialValue, setInitialValue] = useState('');
+  const [newMethodType, setNewMethodType] = useState('');
 
   useEffect(() => {
     updateCodeEditor();
@@ -33,19 +35,21 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
 
   const handleAddMethod = (className) => {
     if (newMethodName) {
-      onAddMethod(className, newMethodName, newMethodReturnType, newMethodParams.split(',').map(p => p.trim()), newMethodOverride);
+      onAddMethod(className, newMethodName, newMethodReturnType, newMethodType, newMethodParams.split(',').map(p => p.trim()), newMethodOverride);
       setNewMethodName('');
       setNewMethodReturnType('void');
       setNewMethodParams('');
+      setNewMethodType('')
       setNewMethodOverride(false);
     }
   };
 
   const handleAddAttribute = (className) => {
     if (newAttributeName) {
-      onAddAttribute(className, newAttributeName, newAttributeType);
+      onAddAttribute(className, newAttributeName, newAttributeType, initialValue);
       setNewAttributeName('');
       setNewAttributeType('int');
+      setInitialValue('');
     }
   };
 
@@ -53,49 +57,51 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
     let codeString = '';
     structure.forEach(classItem => {
       switch (language) {
-        case 'javascript':
-          codeString += `class ${classItem.name}${classItem.parent ? ` extends ${classItem.parent}` : ''} {\n`;
-          classItem.attributes.forEach(attr => {
-            codeString += `  ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''};\n`;
-          });
-          classItem.methods.forEach(method => {
-            codeString += `  ${method.name}(${method.params.join(', ')}) {\n    // TODO: Implement method\n  }\n`;
-          });
-          codeString += '}\n\n';
-          break;
+        // case 'javascript':
+        //   codeString += `class ${classItem.name}${classItem.parent ? ` extends ${classItem.parent}` : ''} {\n`;
+        //   classItem.attributes.forEach(attr => {
+        //     codeString += `  ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''};\n`;
+        //   });
+        //   classItem.methods.forEach(method => {
+        //     codeString += `  ${method.name}(${method.params.join(', ')}) {\n    // TODO: Implement method\n  }\n`;
+        //   });
+        //   codeString += '}\n\n';
+        //   break;
     
-        case 'python':
-          codeString += `class ${classItem.name}${classItem.parent ? `(${classItem.parent})` : ''}:\n`;
-          classItem.attributes.forEach(attr => {
-            codeString += `    ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''}\n`;
-          });
-          classItem.methods.forEach(method => {
-            codeString += `    def ${method.name}(self, ${method.params.join(', ')}):\n        # TODO: Implement method\n        pass\n`;
-          });
-          codeString += '\n';
-          break;
+        // case 'python':
+        //   codeString += `class ${classItem.name}${classItem.parent ? `(${classItem.parent})` : ''}:\n`;
+        //   classItem.attributes.forEach(attr => {
+        //     codeString += `    ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''}\n`;
+        //   });
+        //   classItem.methods.forEach(method => {
+        //     codeString += `    def ${method.name}(self, ${method.params.join(', ')}):\n        # TODO: Implement method\n        pass\n`;
+        //   });
+        //   codeString += '\n';
+        //   break;
     
         case 'cpp':
+          
           codeString += `class ${classItem.name}${classItem.parent ? ` : public ${classItem.parent}` : ''} {\npublic:\n`;
           classItem.attributes.forEach(attr => {
-            codeString += `    ${attr.type} ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''};\n`;
+            console.log(`hi${attr.initialvalue}`);
+            codeString += `    ${attr.type} ${attr.name}${attr.initialvalue ? ` = ${attr.initialvalue}` : ''};\n`;
           });
           classItem.methods.forEach(method => {
-            codeString += `    ${method.returnType} ${method.name}(${method.params.map(param => `${param.type} ${param.name}`).join(', ')}) {\n        // TODO: Implement method\n    }\n`;
+            codeString += `    ${method.methodType} ${method.returnType}  ${method.name}(${method.params.map(param => `${param.type} ${param.name}`).join(', ')}) {\n        // TODO: Implement method\n    }\n`;
           });
           codeString += '};\n\n';
           break;
     
-        case 'java':
-          codeString += `public class ${classItem.name}${classItem.parent ? ` extends ${classItem.parent}` : ''} {\n`;
-          classItem.attributes.forEach(attr => {
-            codeString += `    private ${attr.type} ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''};\n`;
-          });
-          classItem.methods.forEach(method => {
-            codeString += `    public ${method.returnType} ${method.name}(${method.params.map(param => `${param.type} ${param.name}`).join(', ')}) {\n        // TODO: Implement method\n    }\n`;
-          });
-          codeString += '}\n\n';
-          break;
+        // case 'java':
+        //   codeString += `public class ${classItem.name}${classItem.parent ? ` extends ${classItem.parent}` : ''} {\n`;
+        //   classItem.attributes.forEach(attr => {
+        //     codeString += `    private ${attr.type} ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''};\n`;
+        //   });
+        //   classItem.methods.forEach(method => {
+        //     codeString += `    public ${method.returnType} ${method.name}(${method.params.map(param => `${param.type} ${param.name}`).join(', ')}) {\n        // TODO: Implement method\n    }\n`;
+        //   });
+        //   codeString += '}\n\n';
+        //   break;
     
       }
     });
@@ -119,7 +125,7 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
             ))}
             {classItem.methods.map(method => (
               <div key={method.name} className="method-item">
-                <FaFile /> {method.returnType} {method.name}({method.params.join(', ')})
+                <FaFile /> {method.methodType} {method.returnType} {method.name}({method.params.join(', ')})
               </div>
             ))}
             <div className="add-attribute">
@@ -137,6 +143,12 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
                 <option value="float">float</option>
                 <option value="double">double</option>
               </select>
+              <input
+                type="text"
+                value={initialValue}
+                onChange={(e) => setInitialValue(e.target.value)}
+                placeholder="Default Value"
+              />
               <button onClick={() => handleAddAttribute(classItem.name)}><FaPlus /> Add Attribute</button>
             </div>
             <div className="add-method">
@@ -146,12 +158,21 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
                 onChange={(e) => setNewMethodName(e.target.value)}
                 placeholder="Method name"
               />
-              <input
-                type="text"
-                value={newMethodReturnType}
-                onChange={(e) => setNewMethodReturnType(e.target.value)}
-                placeholder="Return type"
-              />
+              <select value={newMethodReturnType} onChange={(e) => setNewMethodReturnType(e.target.value)}>
+                <option value="int">int</option>
+                <option value="bool">bool</option>
+                <option value="char">char</option>
+                <option value="String">String</option>
+                <option value="float">float</option>
+                <option value="double">double</option>
+                <option value="void">void</option>
+              </select>
+              <select value={newMethodType} onChange={(e) => setNewMethodType(e.target.value)}>
+                <option value="N/A">N/A</option>
+                <option value="virtual">virtual</option>
+                <option value="private">private</option>
+                <option value="public">public</option>
+              </select>
               <input
                 type="text"
                 value={newMethodParams}

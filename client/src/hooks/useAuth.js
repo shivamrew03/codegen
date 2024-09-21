@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import api from '../services/api';
+import { useState, useEffect, useCallback } from 'react';
+import api , {handleUnauthorized} from '../services/api';
 
 export const useAuth = () => {
     const [user, setUser] = useState(null);
@@ -13,6 +13,7 @@ export const useAuth = () => {
         try {
             const response = await api.get('/auth/me');
             setUser(response.data.user);
+            // console.log(response.data);
         } catch (error) {
             setUser(null);
         } finally {
@@ -30,11 +31,11 @@ export const useAuth = () => {
         }
     };
 
-    const logout = async () => {
+    const logout = useCallback (async() => {
         const response = await api.post('/auth/logout');
         setUser(null);
-        // return response.data;
-    };
+        alert(response.data.message);
+    }, []);
 
     const signup = async (username, password) => {
         try{

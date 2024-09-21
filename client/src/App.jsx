@@ -1,5 +1,6 @@
 import React from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import './index.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import PrivateRoute from './components/PrivateRoute'
 import Navbar from './components/Navbar'
@@ -11,21 +12,24 @@ import ProjectEditor from './pages/ProjectEditor'
 import CreateProject from './components/CreateProject'
 import ProjectPage from './pages/ProjectPage'
 
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Navbar />
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route path="/login" component={Login} />
-          <Route path="/signup" component={Signup} />
-          <PrivateRoute path="/dashboard" component={Dashboard} />
-          <PrivateRoute path="/project/new" component={CreateProject} />
-          <PrivateRoute path="/project/:id/edit" component={ProjectEditor} />
-          <PrivateRoute path="/project/:id" component={ProjectPage} />
-          {/* <Route path="/projecting" component={ProjectPage} /> */}
-        </Switch>
+        <Routes>
+          <Route exact path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/project/new" element={<CreateProject />} />
+            <Route path="/project/:id/edit" element={<ProjectEditor />} />  
+            <Route path="/project/:id" element={<ProjectPage />} />
+          </Route>
+            {/* <Route path="/projecting" element={<ProjectPage />} /> */}
+        </Routes>
       </Router>
     </AuthProvider>
   )

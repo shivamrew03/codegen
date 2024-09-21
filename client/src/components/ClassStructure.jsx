@@ -35,7 +35,7 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
 
   const handleAddMethod = (className) => {
     if (newMethodName) {
-      onAddMethod(className, newMethodName, newMethodReturnType, newMethodType, newMethodParams.split(',').map(p => p.trim()), newMethodOverride);
+      onAddMethod(className, newMethodName, newMethodReturnType, newMethodType, newMethodParams, newMethodOverride);
       setNewMethodName('');
       setNewMethodReturnType('void');
       setNewMethodParams('');
@@ -57,85 +57,52 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
     let codeString = '';
     structure.forEach(classItem => {
       switch (language) {
-        // case 'javascript':
-        //   codeString += `class ${classItem.name}${classItem.parent ? ` extends ${classItem.parent}` : ''} {\n`;
-        //   classItem.attributes.forEach(attr => {
-        //     codeString += `  ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''};\n`;
-        //   });
-        //   classItem.methods.forEach(method => {
-        //     codeString += `  ${method.name}(${method.params.join(', ')}) {\n    // TODO: Implement method\n  }\n`;
-        //   });
-        //   codeString += '}\n\n';
-        //   break;
-    
-        // case 'python':
-        //   codeString += `class ${classItem.name}${classItem.parent ? `(${classItem.parent})` : ''}:\n`;
-        //   classItem.attributes.forEach(attr => {
-        //     codeString += `    ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''}\n`;
-        //   });
-        //   classItem.methods.forEach(method => {
-        //     codeString += `    def ${method.name}(self, ${method.params.join(', ')}):\n        # TODO: Implement method\n        pass\n`;
-        //   });
-        //   codeString += '\n';
-        //   break;
-    
         case 'cpp':
-          
           codeString += `class ${classItem.name}${classItem.parent ? ` : public ${classItem.parent}` : ''} {\npublic:\n`;
           classItem.attributes.forEach(attr => {
-            console.log(`hi${attr.initialvalue}`);
             codeString += `    ${attr.type} ${attr.name}${attr.initialvalue ? ` = ${attr.initialvalue}` : ''};\n`;
           });
           classItem.methods.forEach(method => {
-            codeString += `    ${method.methodType} ${method.returnType}  ${method.name}(${method.params.map(param => `${param.type} ${param.name}`).join(', ')}) {\n        // TODO: Implement method\n    }\n`;
+            if(method.override){
+              codeString += `    @override`
+            }
+            codeString += `\n   ${method.methodType} ${method.returnType}  ${method.name}(${method.params}) {\n        // TODO: Implement method\n    }\n`;
           });
           codeString += '};\n\n';
           break;
-    
-        // case 'java':
-        //   codeString += `public class ${classItem.name}${classItem.parent ? ` extends ${classItem.parent}` : ''} {\n`;
-        //   classItem.attributes.forEach(attr => {
-        //     codeString += `    private ${attr.type} ${attr.name}${attr.initialValue ? ` = ${attr.initialValue}` : ''};\n`;
-        //   });
-        //   classItem.methods.forEach(method => {
-        //     codeString += `    public ${method.returnType} ${method.name}(${method.params.map(param => `${param.type} ${param.name}`).join(', ')}) {\n        // TODO: Implement method\n    }\n`;
-        //   });
-        //   codeString += '}\n\n';
-        //   break;
-    
       }
     });
     onUpdateCode(codeString);
   };
-  
 
   const renderClass = (classItem) => {
     const isExpanded = expandedClasses[classItem.name];
     return (
-      <div key={classItem.name} className="class-item">
-        <div onClick={() => toggleClass(classItem.name)} className="class-header">
-          {isExpanded ? <FaFolderOpen /> : <FaFolder />} {classItem.name}
+      <div key={classItem.name} className="class-item group transition-transform transform hover:scale-105 hover:bg-gray-700 p-2 rounded-md">
+        <div onClick={() => toggleClass(classItem.name)} className="class-header cursor-pointer flex items-center space-x-2 text-lg text-gray-300 group-hover:text-white">
+          {isExpanded ? <FaFolderOpen /> : <FaFolder />} <span>{classItem.name}</span>
         </div>
         {isExpanded && (
-          <div className="class-content">
+          <div className="class-content ml-5 mt-2">
             {classItem.attributes.map(attr => (
-              <div key={attr.name} className="attribute-item">
-                <FaFile /> {attr.type} {attr.name}
+              <div key={attr.name} className="attribute-item text-gray-400">
+                <FaFile className="inline-block mr-2" /> {attr.type} {attr.name}
               </div>
             ))}
             {classItem.methods.map(method => (
-              <div key={method.name} className="method-item">
-                <FaFile /> {method.methodType} {method.returnType} {method.name}({method.params.join(', ')})
+              <div key={method.name} className="method-item text-gray-400">
+                <FaFile className="inline-block mr-2" /> {method.methodType} {method.returnType} {method.name}({method.params})
               </div>
             ))}
-            <div className="add-attribute">
+            <div className="add-attribute flex items-center mt-2">
               <input
                 type="text"
                 value={newAttributeName}
                 onChange={(e) => setNewAttributeName(e.target.value)}
                 placeholder="Attribute name"
+                className="text-black p-1 rounded mr-2"
               />
-              <select value={newAttributeType} onChange={(e) => setNewAttributeType(e.target.value)}>
+              <select value={newAttributeType} onChange={(e) => setNewAttributeType(e.target.value)} className="text-black p-1 rounded mr-2">
                 <option value="int">int</option>
                 <option value="bool">bool</option>
                 <option value="char">char</option>
@@ -148,17 +115,19 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
                 value={initialValue}
                 onChange={(e) => setInitialValue(e.target.value)}
                 placeholder="Default Value"
+                className="text-black p-1 rounded mr-2"
               />
-              <button onClick={() => handleAddAttribute(classItem.name)}><FaPlus /> Add Attribute</button>
+              <button onClick={() => handleAddAttribute(classItem.name)} className="bg-blue-500 text-white p-1 rounded"><FaPlus /> Add Attribute</button>
             </div>
-            <div className="add-method">
+            <div className="add-method flex items-center mt-2">
               <input
                 type="text"
                 value={newMethodName}
                 onChange={(e) => setNewMethodName(e.target.value)}
                 placeholder="Method name"
+                className="text-black p-1 rounded mr-2"
               />
-              <select value={newMethodReturnType} onChange={(e) => setNewMethodReturnType(e.target.value)}>
+              <select value={newMethodReturnType} onChange={(e) => setNewMethodReturnType(e.target.value)} className="text-black p-1 rounded mr-2">
                 <option value="int">int</option>
                 <option value="bool">bool</option>
                 <option value="char">char</option>
@@ -167,7 +136,7 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
                 <option value="double">double</option>
                 <option value="void">void</option>
               </select>
-              <select value={newMethodType} onChange={(e) => setNewMethodType(e.target.value)}>
+              <select value={newMethodType} onChange={(e) => setNewMethodType(e.target.value)} className="text-black p-1 rounded mr-2">
                 <option value="N/A">N/A</option>
                 <option value="virtual">virtual</option>
                 <option value="private">private</option>
@@ -178,16 +147,18 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
                 value={newMethodParams}
                 onChange={(e) => setNewMethodParams(e.target.value)}
                 placeholder="Parameters (comma-separated)"
+                className="text-black p-1 rounded mr-2"
               />
-              <label>
+              <label className="mr-2">
                 <input
                   type="checkbox"
                   checked={newMethodOverride}
                   onChange={(e) => setNewMethodOverride(e.target.checked)}
+                  className="mr-1"
                 />
                 Override
               </label>
-              <button onClick={() => handleAddMethod(classItem.name)}><FaPlus /> Add Method</button>
+              <button onClick={() => handleAddMethod(classItem.name)} className="bg-blue-500 text-white p-1 rounded"><FaPlus /> Add Method</button>
             </div>
           </div>
         )}
@@ -196,22 +167,24 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
   };
 
   return (
-    <div className="class-structure">
+    <div className="class-structure p-3 bg-gradient-to-b from-gray-900 to-gray-800 h-full text-white">
       {structure.map(renderClass)}
-      <div className="add-class">
+      <div className="add-class flex items-center mt-4">
         <input
           type="text"
           value={newClassName}
           onChange={(e) => setNewClassName(e.target.value)}
           placeholder="Class name"
+          className="text-black p-1 rounded mr-2"
         />
         <input
           type="text"
           value={newClassParent}
           onChange={(e) => setNewClassParent(e.target.value)}
           placeholder="Parent class (optional)"
+          className="text-black p-1 rounded mr-2"
         />
-        <button onClick={handleAddClass}><FaPlus /> Add Class</button>
+        <button onClick={handleAddClass} className="bg-green-500 text-white p-1 rounded"><FaPlus /> Add Class</button>
       </div>
     </div>
   );

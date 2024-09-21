@@ -1,56 +1,100 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
+import { validatePassword } from '../services/validatePassword';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const { signup } = useAuthContext();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (passwordError) {
+      toast.error(passwordError);
+      return;
+    }
     try {
       const response = await signup(username, password);
-      history.push('/login');
+      toast.success('Signup successful!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      setTimeout(() => navigate('/login', { replace: true }), 1000);
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-      const statusCode = error.response?.data?.statusCode || 500;
-      console.log("sign Up error: ", error);
+      const errorMessage = error.message || 'An unexpected error occurred';
+      const statusCode = error.statusCode || 500;
       switch (statusCode) {
         case 400:
-          alert(`Bad Request: ${errorMessage}`);
+          toast.error(`Bad Request: ${errorMessage}`);
           break;
         case 401:
-          alert(`Unauthorized: ${errorMessage}`);
+          toast.error(`Unauthorized: ${errorMessage}`);
           break;
         case 404:
-          alert(`Not Found: ${errorMessage}`);
+          toast.error(`Not Found: ${errorMessage}`);
           break;
         default:
-          alert(`Error: ${errorMessage}`);
+          toast.error(`Error: ${errorMessage}`);
       }
     }
   };
 
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordError(validatePassword(newPassword));
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Username"
-        required
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        required
-      />
-      <button type="submit">Sign Up</button>
-    </form>
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
+      </div>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={handlePasswordChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+              {passwordError && <p className="mt-2 text-sm text-red-600">{passwordError}</p>}
+            </div>
+            <div>
+              <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" disabled={!!passwordError}>
+                Sign Up
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <ToastContainer />
+    </div>
   );
 };
 

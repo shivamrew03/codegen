@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import CodeEditor from '../components/CodeEditor';
 import ClassStructure from '../components/ClassStructure';
-import '../styles/ProjectPage.css';
 
 const ProjectPage = () => {
   const [code, setCode] = useState('');
@@ -10,16 +9,12 @@ const ProjectPage = () => {
 
   const handleCodeChange = (newCode) => {
     setCode(newCode);
-    
-    // Parse the new code and update the class structure
+
     const updatedStructure = parseCode(newCode);
     setClassStructure(updatedStructure);
   };
 
-  // Add this helper function to parse the code
   const parseCode = (code) => {
-    // This is a basic implementation. You may need a more sophisticated parser
-    // depending on the complexity of your code and supported languages.
     const classRegex = /class\s+(\w+)(?:\s+extends\s+(\w+))?\s*{([^}]*)}/g;
     const methodRegex = /(\w+)\s+(\w+)\s*\(([^)]*)\)/g;
     const attributeRegex = /(\w+)\s+(\w+);/g;
@@ -43,7 +38,7 @@ const ProjectPage = () => {
           name: methodName,
           returnType,
           params: params.split(',').map(p => p.trim()),
-          override: classBody.includes(`@Override`) // Basic override detection
+          override: classBody.includes(`@Override`)
         });
       }
 
@@ -58,6 +53,7 @@ const ProjectPage = () => {
 
     return structure;
   };
+
   const handleAddClass = (className, parentClass) => {
     setClassStructure([...classStructure, { name: className, parent: parentClass, methods: [], attributes: [] }]);
   };
@@ -93,14 +89,18 @@ const ProjectPage = () => {
   };
 
   return (
-    <div className="project-page">
-      <div className="left-panel">
-        <select value={language} onChange={(e) => setLanguage(e.target.value)} className="language-select">
-          {/* <option value="javascript">JavaScript</option>
-          <option value="python">Python</option>
-          <option value="java">Java</option> */}
+    <div className="flex h-screen overflow-hidden">
+      {/* Left Panel */}
+      <div className="w-2.25/5 min-w-[300px] border-r border-gray-200 p-5 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="w-full p-2 mb-4 border border-gray-600 bg-gray-700 rounded-lg text-lg text-white"
+        >
           <option value="cpp">C++</option>
         </select>
+
+        {/* Class Structure */}
         <ClassStructure
           structure={classStructure}
           onAddClass={handleAddClass}
@@ -110,7 +110,9 @@ const ProjectPage = () => {
           language={language}
         />
       </div>
-      <div className="right-panel">
+
+      {/* Right Panel */}
+      <div className="flex-grow flex flex-col overflow-hidden">
         <CodeEditor code={code} onChange={handleCodeChange} language={language} />
       </div>
     </div>

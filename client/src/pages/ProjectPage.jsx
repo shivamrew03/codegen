@@ -91,7 +91,7 @@ const ProjectPage = () => {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Panel */}
-      <div className="w-2/5 min-w-[300px] border-r border-gray-200 p-5 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+      <div className="w-2.25/5 min-w-[300px] border-r border-gray-200 p-5 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 text-white">
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}

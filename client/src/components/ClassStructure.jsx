@@ -63,7 +63,10 @@ const ClassStructure = ({ structure, onAddClass, onAddMethod, onAddAttribute, on
             codeString += `    ${attr.type} ${attr.name}${attr.initialvalue ? ` = ${attr.initialvalue}` : ''};\n`;
           });
           classItem.methods.forEach(method => {
-            codeString += `    ${method.methodType} ${method.returnType}  ${method.name}(${method.params}) {\n        // TODO: Implement method\n    }\n`;
+            if(method.override){
+              codeString += `    @override`
+            }
+            codeString += `\n   ${method.methodType} ${method.returnType}  ${method.name}(${method.params}) {\n        // TODO: Implement method\n    }\n`;
           });
           codeString += '};\n\n';
           break;

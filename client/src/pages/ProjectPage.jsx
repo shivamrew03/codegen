@@ -1,96 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CodeEditor from '../components/CodeEditor';
 import ClassStructure from '../components/ClassStructure';
 
 const ProjectPage = () => {
-  const [code, setCode] = useState('');
-  const [classStructure, setClassStructure] = useState([]);
-  const [language, setLanguage] = useState('cpp');
+  const [classStructure, setClassStructure] = useState(() => {
+    const savedStructure = localStorage.getItem('classStructure');
+    return savedStructure ? JSON.parse(savedStructure) : [];
+  });
 
-  const handleCodeChange = (newCode) => {
-    setCode(newCode);
+  const [language, setLanguage] = useState(() => {
+    const savedLanguage = localStorage.getItem('language');
+    return savedLanguage ? savedLanguage : 'cpp';
+  });
 
-    const updatedStructure = parseCode(newCode);
-    setClassStructure(updatedStructure);
-  };
+  useEffect(() => {
+    localStorage.setItem('classStructure', JSON.stringify(classStructure));
+  }, [classStructure]);
 
-  const parseCode = (code) => {
-    const classRegex = /class\s+(\w+)(?:\s+extends\s+(\w+))?\s*{([^}]*)}/g;
-    const methodRegex = /(\w+)\s+(\w+)\s*\(([^)]*)\)/g;
-    const attributeRegex = /(\w+)\s+(\w+);/g;
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
 
-    const structure = [];
-    let match;
-
-    while ((match = classRegex.exec(code)) !== null) {
-      const [, className, parentClass, classBody] = match;
-      const classInfo = {
-        name: className,
-        parent: parentClass || '',
-        methods: [],
-        attributes: []
-      };
-
-      let methodMatch;
-      while ((methodMatch = methodRegex.exec(classBody)) !== null) {
-        const [, returnType, methodName, params] = methodMatch;
-        classInfo.methods.push({
-          name: methodName,
-          returnType,
-          params: params.split(',').map(p => p.trim()),
-          override: classBody.includes(`@Override`)
-        });
-      }
-
-      let attrMatch;
-      while ((attrMatch = attributeRegex.exec(classBody)) !== null) {
-        const [, attrType, attrName] = attrMatch;
-        classInfo.attributes.push({ name: attrName, type: attrType });
-      }
-
-      structure.push(classInfo);
+  const handleAddClass = (newClass) => {
+    if (classStructure.some(cls => cls.name === newClass.name)) {
+      alert('A class with this name already exists.');
+      return;
     }
-
-    return structure;
+    setClassStructure([...classStructure, newClass]);
   };
 
-  const handleAddClass = (className, parentClass) => {
-    setClassStructure([...classStructure, { name: className, parent: parentClass, methods: [], attributes: [] }]);
+  const handleUpdateClass = (updatedClass) => {
+    setClassStructure(classStructure.map(cls => 
+      cls.name === updatedClass.name ? updatedClass : cls
+    ));
   };
 
-  const handleAddMethod = (className, methodName, returnType, methodType, params, override) => {
-    const updatedStructure = classStructure.map(cls => {
-      if (cls.name === className) {
-        return {
-          ...cls,
-          methods: [...cls.methods, { name: methodName, returnType, methodType, params, override }]
-        };
-      }
-      return cls;
+  const handleDeleteClass = (className) => {
+    setClassStructure(classStructure.filter(cls => cls.name !== className));
+  };
+
+  const deleteClass = (className) => {
+    const classesToDelete = [className];
+    const findDescendants = (parentName) => {
+      classStructure.forEach(cls => {
+        if (cls.parent === parentName) {
+          classesToDelete.push(cls.name);
+          findDescendants(cls.name);
+        }
+      });
+    };
+    findDescendants(className);
+    
+    setClassStructure(prevStructure => 
+      prevStructure.filter(cls => !classesToDelete.includes(cls.name))
+    );
+  };
+  
+
+  const generateCode = () => {
+    let code = '';
+    classStructure.forEach(cls => {
+      code += `class ${cls.name}${cls.parent ? ` : ${cls.inheritanceType} ${cls.parent}` : ''} {\n`;
+      ['private', 'protected', 'public'].forEach(access => {
+        if (cls[access].attributes.length > 0 || cls[access].methods.length > 0) {
+          code += `${access}:\n`;
+          cls[access].attributes.forEach(attr => {
+            code += `    ${attr.type} ${attr.name}${attr.defaultValue ? ` = ${attr.defaultValue}` : ''};\n`;
+          });
+          cls[access].methods.forEach(method => {
+            code += `    ${method.returnType} ${method.name}(${method.params.join(', ')}) {\n`;
+            code += `        // TODO: Implement method\n`;
+            code += `    }\n`;
+          });
+        }
+      });
+      code += '};\n\n';
     });
-    setClassStructure(updatedStructure);
+    return code;
   };
-
-  const handleAddAttribute = (className, attributeName, attributeType, initialValue) => {
-    const updatedStructure = classStructure.map(cls => {
-      if (cls.name === className) {
-        return {
-          ...cls,
-          attributes: [...cls.attributes, { name: attributeName, type: attributeType, initialvalue: initialValue }]
-        };
-      }
-      return cls;
-    });
-    setClassStructure(updatedStructure);
-  };
-
-  const handleUpdateCode = (newCode) => {
-    setCode(newCode);
-  };
-
+  
+  // localStorage.clear();
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Panel */}
       <div className="w-2.25/5 min-w-[300px] border-r border-gray-200 p-5 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 text-white">
         <select
           value={language}
@@ -99,21 +90,15 @@ const ProjectPage = () => {
         >
           <option value="cpp">C++</option>
         </select>
-
-        {/* Class Structure */}
         <ClassStructure
           structure={classStructure}
           onAddClass={handleAddClass}
-          onAddMethod={handleAddMethod}
-          onAddAttribute={handleAddAttribute}
-          onUpdateCode={handleUpdateCode}
-          language={language}
+          onUpdateClass={handleUpdateClass}
+          onDeleteClass={deleteClass}
         />
       </div>
-
-      {/* Right Panel */}
       <div className="flex-grow flex flex-col overflow-hidden">
-        <CodeEditor code={code} onChange={handleCodeChange} language={language} />
+        <CodeEditor code={generateCode()} language={language} />
       </div>
     </div>
   );

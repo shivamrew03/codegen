@@ -31,11 +31,17 @@ export const useAuth = () => {
         }
     };
 
-    const logout = useCallback (async() => {
-        const response = await api.post('/auth/logout');
-        setUser(null);
-        alert(response.data.message);
-    }, []);
+    const logout = useCallback(async () => {
+        try {
+          const response = await api.post('/auth/logout');
+          setUser(null);
+        //   await new Promise(resolve => setTimeout(resolve, 2000));
+          return response.data;
+        } catch (error) {
+          throw error;
+        }
+      }, []);
+      
 
     const signup = async (username, password) => {
         try{

@@ -63,7 +63,7 @@ const Dashboard = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="pt-20 min-h-screen bg-gray-120 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Projects</h1>
         <Link to="/project/new" className="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6">
@@ -71,7 +71,7 @@ const Dashboard = () => {
         </Link>
         <ul className="bg-white shadow overflow-hidden sm:rounded-md">
           {projects.map((project) => (
-            <li key={project._id} className="border-b border-gray-200 last:border-b-0">
+            <li key={project._id} className="p-[2px] px-[0.5px] border-b border-gray-200 last:border-b-0">
               <div className="px-4 py-4 sm:px-6 flex items-center justify-between">
                 <Link to={`/project/${project._id}`} className="text-lg font-medium text-indigo-600 hover:text-indigo-900">
                   {project.name}

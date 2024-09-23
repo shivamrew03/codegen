@@ -81,7 +81,7 @@ const ProjectPage = () => {
   
   // localStorage.clear();
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="pt-[64px] flex h-screen overflow-hidden">
       <div className="w-2.25/5 min-w-[300px] border-r border-gray-200 p-5 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 text-white">
         <select
           value={language}

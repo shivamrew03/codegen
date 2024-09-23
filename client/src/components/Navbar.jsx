@@ -69,22 +69,26 @@ const Navbar = () => {
   //   }
   // };
 
+  const isHomePage = location.pathname === '/';
+  const navbarClass = isHomePage
+    ? 'bg-transparent absolute top-0 left-0 right-0 z-10'
+    : 'bg-gradient-to-r from-indigo-600 to-purple-600 absolute top-0 left-0 right-0 z-10';
 
   return (
-    <nav className="bg-indigo-600">
+    <nav className={`${navbarClass} shadow-lg`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <div className="flex-shrink-0 text-white font-bold text-xl">
-              CodeGen
-            </div>
+            <Link to="/" className="flex-shrink-0">
+              <span className="text-white font-bold text-2xl tracking-tight">CodeGen</span>
+            </Link>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
                 {location.pathname !== '/' && (
-                  <Link to="/" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+                  <Link to="/" className="text-white hover:bg-indigo-500 hover:bg-opacity-75 px-3 py-2 rounded-md text-lg font-medium transition duration-150 ease-in-out">Home</Link>
                 )}
                 {user && location.pathname !== '/dashboard' && (
-                  <Link to="/dashboard" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
+                  <Link to="/dashboard" className="text-white hover:bg-indigo-500 hover:bg-opacity-75 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">Dashboard</Link>
                 )}
               </div>
             </div>
@@ -93,13 +97,13 @@ const Navbar = () => {
             <div className="ml-4 flex items-center md:ml-6">
               {user ? (
                 <>
-                  <span className="text-white mr-4">Welcome, {user.username}</span>
-                  <button onClick={handleLogout} className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">Logout</button>
+                  <span className="text-white mr-8 text-lg">Welcome, {user.username}</span>
+                  <button onClick={handleLogout} className="text-white bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-md text-lg font-medium transition duration-150 ease-in-out">Logout</button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">Login</Link>
-                  <Link to="/signup" className="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">Sign Up</Link>
+                  <Link to="/login" className="text-indigo-600 bg-white hover:bg-gray-100 px-4 py-2 mx-1 rounded-md text-lg font-medium transition duration-150 ease-in-out">Login</Link>
+                  <Link to="/signup" className="text-indigo-600 bg-white hover:bg-gray-100 px-4 py-2 mx-1 rounded-md text-lg font-medium transition duration-150 ease-in-out">Sign Up</Link>
                 </>
               )}
             </div>

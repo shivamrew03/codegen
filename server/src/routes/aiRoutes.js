@@ -2,8 +2,8 @@ import express from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const router = express.Router();
-const genAI = new GoogleGenerativeAI("AIzaSyBmsJWHrDsMeEnUBVn8vr3SX5m4SfFJzb4");
-// const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+
+const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
 const model = genAI.getGenerativeModel({
   model: 'gemini-1.5-flash',

@@ -11,8 +11,8 @@ export const getProjects = async (req, res, next) => {
 
 export const createProject = async (req, res, next) => {
   try {
-    const { name, description, content } = req.body;
-    const project = await projectService.createProject(req.userId, { name, description, content });
+    const { name, description, classStructure, code } = req.body;
+    const project = await projectService.createProject(req.userId, { name, description, classStructure, code });
     res.status(201).json(project);
   } catch (error) {
     next(error);
@@ -21,9 +21,16 @@ export const createProject = async (req, res, next) => {
 
 export const updateProject = async (req, res, next) => {
   try {
-    const { name, description, content } = req.body;
-    const project = await projectService.updateProject(req.params.id, req.userId, { name, description, content });
-    res.json(project);
+    const { id } = req.params;
+    const { name, description, classStructure, code } = req.body;
+
+    const updatedProject = await projectService.updateProject(id, req.userId, { name, description, classStructure, code });
+
+    if (!updatedProject) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    res.status(200).json(updatedProject);
   } catch (error) {
     next(error);
   }

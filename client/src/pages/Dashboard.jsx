@@ -13,7 +13,7 @@ const Dashboard = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await api.get('/projects');
+      const response = await api.get('/api/projects');
       setProjects(response.data);
     }
     catch (error) {
@@ -38,7 +38,7 @@ const Dashboard = () => {
   const deleteProject = async (id) => {
     if (!window.confirm('Are you sure you want to delete this project?')) return;
     try {
-      await api.delete(`/projects/${id}`);
+      await api.delete(`/api/projects/${id}`);
       fetchProjects();
       toast.success('Project deleted successfully');
     } catch (error) {

@@ -28,7 +28,6 @@ function App() {
             <Route path="/project/:id/edit" element={<ProjectEditor />} />  
             <Route path="/project/:id" element={<ProjectPage />} />
           </Route>
-            <Route path="/projecting" element={<ProjectPage />} />
         </Routes>
       </Router>
     </AuthProvider>

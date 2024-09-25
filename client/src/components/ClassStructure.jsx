@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { FaFolder, FaFolderOpen, FaFile, FaPlus, FaMinus, FaTrash  } from 'react-icons/fa';
 
 const ClassStructure = ({ structure, onAddClass, onUpdateClass, onDeleteClass }) => {
@@ -50,6 +50,7 @@ const ClassStructure = ({ structure, onAddClass, onUpdateClass, onDeleteClass })
           protected: { attributes: [], methods: [] },
         };
         onAddClass(newClass);
+        
         setNewClassName('');
         setNewClassParents([]);
       }
@@ -132,7 +133,7 @@ const ClassStructure = ({ structure, onAddClass, onUpdateClass, onDeleteClass })
 
   const handleGetAISuggestions = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/ai/suggest', {
+      const response = await api.post('/api/ai/suggest', {
         methodName: newMethodName,
         returnType: newMethodReturnType,
         params: newMethodParams,

@@ -1,28 +1,48 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 import CodeEditor from '../components/CodeEditor';
 import ClassStructure from '../components/ClassStructure';
-import axios from 'axios';
+import api from '../services/api';
 
-const ProjectPage = ({ projectId }) => {
-  const [leftPanelWidth, setLeftPanelWidth] = useState(300); // Initial width
-
+const ProjectPage = () => {
+  // localStorage.clear();
+  const [leftPanelWidth, setLeftPanelWidth] = useState(300);
+  const { id } = useParams();
+  const projectId = location.state?.projectId || id;
   const [classStructure, setClassStructure] = useState(() => {
     const savedStructure = localStorage.getItem('classStructure');
     return savedStructure ? JSON.parse(savedStructure) : [];
   });
-
+  
   const [language, setLanguage] = useState(() => {
     const savedLanguage = localStorage.getItem('language');
-    return savedLanguage ? savedLanguage : 'cpp';
+    return savedLanguage || 'cpp';
   });
 
-  useEffect(() => {
-    localStorage.setItem('classStructure', JSON.stringify(classStructure));
-  }, [classStructure]);
+  const [pName, setpName] = useState('');
+  const [pDesc, setpDesc] = useState('');
 
+   // Initial width
   useEffect(() => {
-    localStorage.setItem('language', language);
-  }, [language]);
+    const fetchProject = async () => {
+      try {
+        const response = await api.get(`api/projects/${projectId}`);
+        const { name: fetchedName, description: fetchedDesc, classStructure: fetchedStructure, code: fetchedCode } = response.data;
+        setpName(fetchedName);
+        setpDesc(fetchedDesc);
+        setClassStructure(fetchedStructure || []);
+        localStorage.setItem('classStructure', JSON.stringify(fetchedStructure || []));
+        
+        setLanguage(fetchedCode ? 'cpp' : 'cpp');
+        localStorage.setItem('language', fetchedCode ? 'cpp' : 'cpp');
+      } catch (error) {
+        console.error('Error fetching project:', error);
+      }
+    };
+  
+    fetchProject();
+  }, [projectId]);
+  
 
   const handleAddClass = (newClass) => {
     if (classStructure.some(cls => cls.name === newClass.name)) {
@@ -114,28 +134,39 @@ const ProjectPage = ({ projectId }) => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`/api/projects/${projectId}`, {
+      console.log("projectid ", projectId);
+      await api.put(`api/projects/${projectId}`, {
         classStructure,
         code: generateCode(),
       });
+      localStorage.clear();
       alert('Project saved successfully!');
     } catch (error) {
       console.error('Error saving project:', error);
       alert('Failed to save project. Please try again.');
     }
   };
-
+  // console.log(projectId);
   // localStorage.clear();
   return (
     <div className="flex h-screen">
       <div style={{ width: `${leftPanelWidth}px` }} className="flex-shrink-0 border-r border-gray-200 p-5 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-        <select
+        <br />
+        <br />
+        {/* <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
           className="w-full p-2 mb-4 border border-gray-600 bg-gray-700 rounded-lg text-lg text-white"
         >
           <option value="cpp">C++</option>
-        </select>
+        </select> */}
+      <div className="mt-auto pt-4 border-t border-gray-700">
+        <h2 className="text-xl font-bold mb-2 text-blue-300">Project Name: {pName}</h2>
+        <p className="text-sm text-gray-300">Project Description: {pDesc}</p>
+      </div>
+      <br />
+      <hr />
+      <br />
         <ClassStructure
           structure={classStructure}
           onAddClass={handleAddClass}

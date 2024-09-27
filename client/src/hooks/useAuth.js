@@ -16,7 +16,6 @@ export const useAuth = () => {
         } catch (error) {
             if (error.response?.data?.statusCode === 401) {
                 setUser(null);
-                console.log(user);
             } else {
                 console.error("An unexpected error occurred", error);
             }

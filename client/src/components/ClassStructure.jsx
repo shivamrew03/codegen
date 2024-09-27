@@ -133,7 +133,7 @@ const ClassStructure = ({ structure, onAddClass, onUpdateClass, onDeleteClass })
 
   const handleGetAISuggestions = async () => {
     try {
-      const response = await api.post('/api/ai/suggest', {
+      const response = await api.post('/ai/suggest', {
         methodName: newMethodName,
         returnType: newMethodReturnType,
         params: newMethodParams,

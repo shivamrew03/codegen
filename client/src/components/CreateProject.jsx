@@ -14,7 +14,7 @@ const CreateProject = () => {
     try {
       var classStructure;
       var code;
-      const response = await api.post('/api/projects', { name, description, classStructure, code });
+      const response = await api.post('/projects', { name, description, classStructure, code });
       console.log(response);
       toast.success('Project created successfully');
       navigate(`/project/${response.data._id}`, {state: { projectId: response.data._id }}); //Redirecting ProjectPage.jsx

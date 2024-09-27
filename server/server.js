@@ -16,9 +16,7 @@ const app = express();
 
 // Middleware
 app.use(logger);
-
 app.use(cors({ origin: process.env.CLIENT_URL,  credentials: true }));
-
 app.use(express.json());
 app.use(cookieParser());
 
@@ -26,7 +24,7 @@ app.use(cookieParser());
 connectDatabase();
 
 // Routes
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/ai', aiRoutes)
 app.use((req, res, next) => { // If no route matches, throw a NotFoundError

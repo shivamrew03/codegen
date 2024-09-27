@@ -17,7 +17,7 @@ const ProjectEditor = () => {
 
   const fetchProject = async () => {
     try {
-      const response = await api.get(`/api/projects/${id}`);
+      const response = await api.get(`/projects/${id}`);
       const { name, description, content } = response.data; // Destructure the data
       setProject({ name, description, content });
     } catch (error) {
@@ -46,7 +46,7 @@ const ProjectEditor = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/api/projects/${id}`, project);
+      await api.put(`/projects/${id}`, project);
       alert('Project details updated successfully');
       navigate('/dashboard');
     } catch (error) {

@@ -26,7 +26,7 @@ const ProjectPage = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await api.get(`api/projects/${projectId}`);
+        const response = await api.get(`/projects/${projectId}`);
         const { name: fetchedName, description: fetchedDesc, classStructure: fetchedStructure, code: fetchedCode } = response.data;
         setpName(fetchedName);
         setpDesc(fetchedDesc);
@@ -135,7 +135,7 @@ const ProjectPage = () => {
   const handleSave = async () => {
     try {
       console.log("projectid ", projectId);
-      await api.put(`api/projects/${projectId}`, {
+      await api.put(`/projects/${projectId}`, {
         classStructure,
         code: generateCode(),
       });

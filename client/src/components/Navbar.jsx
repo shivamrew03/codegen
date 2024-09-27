@@ -18,7 +18,6 @@ const Navbar = () => {
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-1"
             onClick={async () => {
               const response = await logout();
-              console.log(response);
               setTimeout(() => {
                 toast.success(response.message, {
                   position: "top-right",
@@ -46,7 +45,7 @@ const Navbar = () => {
       {
         position: "top-center",
         autoClose: true,
-        closeOnClick: false,
+        closeOnClick: true,
         pauseOnHover: true,
         draggable: false,
         closeButton: false,

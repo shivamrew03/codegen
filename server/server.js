@@ -30,6 +30,7 @@ app.use('/api/ai', aiRoutes)
 app.use((req, res, next) => { // If no route matches, throw a NotFoundError
   next(new NotFoundError('Route not found')); 
 });
+app.use(errorHandler);
 
 app.use(express.static(path.join(__dirname, "/client/dist")));
 

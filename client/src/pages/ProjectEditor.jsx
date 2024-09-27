@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 const ProjectEditor = () => {
   const [project, setProject] = useState({ name: '', description: '', content: '' });
@@ -21,8 +20,8 @@ const ProjectEditor = () => {
       const { name, description, content } = response.data; // Destructure the data
       setProject({ name, description, content });
     } catch (error) {
-      const errorMessage = error.message || 'An unexpected error occurred';
-      const statusCode = error.statusCode || 500;
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
       switch (statusCode) {
         case 400:
           toast.error(`Bad Request: ${errorMessage}`);
@@ -47,11 +46,19 @@ const ProjectEditor = () => {
     e.preventDefault();
     try {
       await api.put(`/projects/${id}`, project);
-      alert('Project details updated successfully');
+      setTimeout(() => {
+        toast.success('Project details updated successfully', {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }, 100);
       navigate('/dashboard');
     } catch (error) {
-      console.error('Error updating project:', error);
-      alert('Failed to update project details');
+      toast.error('Failed to update project details');
     }
   };
 
@@ -100,7 +107,6 @@ const ProjectEditor = () => {
           </form>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 };

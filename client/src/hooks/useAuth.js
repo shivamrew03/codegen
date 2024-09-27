@@ -27,7 +27,7 @@ export const useAuth = () => {
             setUser(response.data.user);
             return response.data;
         } catch (error) {
-            throw error.response?.data || error;
+            throw error;
         }
     };
 
@@ -48,7 +48,7 @@ export const useAuth = () => {
             const response = await api.post('/auth/signup', { username, password });
             return response.data;
         } catch (error) {
-            throw error.response?.data || error;
+            throw error;
         }
     };
 

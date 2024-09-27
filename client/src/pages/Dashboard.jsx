@@ -17,8 +17,8 @@ const Dashboard = () => {
       setProjects(response.data);
     }
     catch (error) {
-      const errorMessage = error.message || 'An unexpected error occurred';
-      const statusCode = error.statusCode || 500;
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
       switch (statusCode) {
         case 400:
           toast.error(`Bad Request: ${errorMessage}`);
@@ -36,30 +36,91 @@ const Dashboard = () => {
   };
 
   const deleteProject = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this project?')) return;
-    try {
-      await api.delete(`/projects/${id}`);
-      fetchProjects();
-      toast.success('Project deleted successfully');
-    } catch (error) {
-      const errorMessage = error.message || 'An unexpected error occurred';
-      const statusCode = error.statusCode || 500;
-      console.error('Error deleting project:', error);
-      switch (statusCode) {
-        case 400:
-          toast.error(`Bad Request: ${errorMessage}`);
-          break;
-        case 401:
-          toast.error(`Unauthorized: ${errorMessage}`);
-          break;
-        case 404:
-          toast.error(`Not Found: ${errorMessage}`);
-          break;
-        default:
-          toast.error(`Error: ${errorMessage}`);
+    toast.info(
+      <div className="text-center">
+        <p className="text-lg font-semibold mb-4">Are you sure you want to delete this project?</p>
+        <div className="flex justify-center space-x-4">
+          <button
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-1"
+            onClick={async () => {
+              try {
+                await api.delete(`/projects/${id}`);
+                fetchProjects();
+                toast.success('Project deleted successfully', {
+                  position: "top-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                });
+              } catch (error) {
+                const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+                const statusCode = error.response?.data?.statusCode || 500;
+                console.error('Error deleting project:', error);
+                switch (statusCode) {
+                  case 400:
+                    toast.error(`Bad Request: ${errorMessage}`);
+                    break;
+                  case 401:
+                    toast.error(`Unauthorized: ${errorMessage}`);
+                    break;
+                  case 404:
+                    toast.error(`Not Found: ${errorMessage}`);
+                    break;
+                  default:
+                    toast.error(`Error: ${errorMessage}`);
+                }
+              }
+            }}
+          >
+            Yes, Delete
+          </button>
+          <button
+            className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-1"
+            onClick={() => toast.dismiss()}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      {
+        position: "top-center",
+        autoClose: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        closeButton: false,
+        className: "bg-white text-gray-800 p-6 rounded-lg shadow-xl border-t-4 border-indigo-500",
       }
-    }
-  };
+    );
+  }
+
+  // const deleteProject = async (id) => {
+  //   if (!window.confirm('Are you sure you want to delete this project?')) return;
+  //   try {
+  //     await api.delete(`/projects/${id}`);
+  //     fetchProjects();
+  //     toast.success('Project deleted successfully');
+  //   } catch (error) {
+  //     const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+  //     const statusCode = error.response?.data?.statusCode || 500;
+  //     console.error('Error deleting project:', error);
+  //     switch (statusCode) {
+  //       case 400:
+  //         toast.error(`Bad Request: ${errorMessage}`);
+  //         break;
+  //       case 401:
+  //         toast.error(`Unauthorized: ${errorMessage}`);
+  //         break;
+  //       case 404:
+  //         toast.error(`Not Found: ${errorMessage}`);
+  //         break;
+  //       default:
+  //         toast.error(`Error: ${errorMessage}`);
+  //     }
+  //   }
+  // };
 
 
   return (

@@ -22,7 +22,7 @@ const Signup = () => {
       const response = await signup(username, password);
       toast.success('Signup successful!', {
         position: "top-right",
-        autoClose: 3000,
+        autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -30,8 +30,8 @@ const Signup = () => {
       });
       setTimeout(() => navigate('/login', { replace: true }), 1000);
     } catch (error) {
-      const errorMessage = error.message || 'An unexpected error occurred';
-      const statusCode = error.statusCode || 500;
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
       switch (statusCode) {
         case 400:
           toast.error(`Bad Request: ${errorMessage}`);

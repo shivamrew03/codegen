@@ -24,11 +24,9 @@ const Login = () => {
         });
       }, 10);
       navigate('/dashboard', { replace: true });
-      // setTimeout(() => navigate('/dashboard', { replace: true }), 200);
-    } catch (error) {
-      console.error(error.status);
-      const errorMessage = error.message || 'An unexpected error occurred';
-      const statusCode = error.statusCode || 500;
+    } catch (error) { 
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      const statusCode = error.response?.data?.statusCode || 500;
       switch (statusCode) {
         case 400:
           toast.error(`Bad Request: ${errorMessage}`);

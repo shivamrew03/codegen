@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import api , {handleUnauthorized} from '../services/api';
+import api from '../services/api';
 
 export const useAuth = () => {
     const [user, setUser] = useState(null);
@@ -13,9 +13,13 @@ export const useAuth = () => {
         try {
             const response = await api.get('/auth/me');
             setUser(response.data.user);
-            // console.log(response.data);
         } catch (error) {
-            setUser(null);
+            if (error.response?.data?.statusCode === 401) {
+                setUser(null);
+                console.log(user);
+            } else {
+                console.error("An unexpected error occurred", error);
+            }
         } finally {
             setLoading(false);
         }
@@ -33,18 +37,18 @@ export const useAuth = () => {
 
     const logout = useCallback(async () => {
         try {
-          const response = await api.post('/auth/logout');
-          setUser(null);
-        //   await new Promise(resolve => setTimeout(resolve, 2000));
-          return response.data;
+            const response = await api.post('/auth/logout');
+            setUser(null);
+            //   await new Promise(resolve => setTimeout(resolve, 2000));
+            return response.data;
         } catch (error) {
-          throw error;
+            throw error;
         }
-      }, []);
-      
+    }, []);
+
 
     const signup = async (username, password) => {
-        try{
+        try {
             const response = await api.post('/auth/signup', { username, password });
             return response.data;
         } catch (error) {

@@ -5,7 +5,6 @@ import ClassStructure from '../components/ClassStructure';
 import api from '../services/api';
 
 const ProjectPage = () => {
-  // localStorage.clear();
   const [leftPanelWidth, setLeftPanelWidth] = useState(300);
   const { id } = useParams();
   const projectId = location.state?.projectId || id;
@@ -22,7 +21,6 @@ const ProjectPage = () => {
   const [pName, setpName] = useState('');
   const [pDesc, setpDesc] = useState('');
 
-   // Initial width
   useEffect(() => {
     const fetchProject = async () => {
       try {
@@ -42,14 +40,57 @@ const ProjectPage = () => {
   
     fetchProject();
   }, [projectId]);
-  
+
+  const applyInheritanceRules = (childClass, parentClass, inheritanceType) => {
+    const inheritedMembers = {
+      public: { attributes: [], methods: [] },
+      protected: { attributes: [], methods: [] },
+      private: { attributes: [], methods: [] }
+    };
+
+    ['public', 'protected'].forEach(access => {
+      parentClass[access].attributes.forEach(attr => {
+        const newAccess = inheritanceType === 'public' ? access : inheritanceType;
+        inheritedMembers[newAccess].attributes.push({...attr, inherited: true});
+      });
+      parentClass[access].methods.forEach(method => {
+        const newAccess = inheritanceType === 'public' ? access : inheritanceType;
+        inheritedMembers[newAccess].methods.push({...method, inherited: true});
+      });
+    });
+
+    return {
+      ...childClass,
+      public: {
+        attributes: [...childClass.public.attributes, ...inheritedMembers.public.attributes],
+        methods: [...childClass.public.methods, ...inheritedMembers.public.methods]
+      },
+      protected: {
+        attributes: [...childClass.protected.attributes, ...inheritedMembers.protected.attributes],
+        methods: [...childClass.protected.methods, ...inheritedMembers.protected.methods]
+      },
+      private: {
+        attributes: [...childClass.private.attributes, ...inheritedMembers.private.attributes],
+        methods: [...childClass.private.methods, ...inheritedMembers.private.methods]
+      }
+    };
+  };
 
   const handleAddClass = (newClass) => {
     if (classStructure.some(cls => cls.name === newClass.name)) {
       alert('A class with this name already exists.');
       return;
     }
-    setClassStructure([...classStructure, newClass]);
+    let updatedClass = newClass;
+    if (newClass.parents && newClass.parents.length > 0) {
+      newClass.parents.forEach(parent => {
+        const parentClass = classStructure.find(cls => cls.name === parent.name);
+        if (parentClass) {
+          updatedClass = applyInheritanceRules(updatedClass, parentClass, parent.inheritanceType);
+        }
+      });
+    }
+    setClassStructure([...classStructure, updatedClass]);
   };
 
   const handleUpdateClass = (updatedClass) => {
@@ -58,15 +99,25 @@ const ProjectPage = () => {
     ));
   };
 
-  const handleDeleteClass = (className) => {
-    setClassStructure(classStructure.filter(cls => cls.name !== className));
+  const handleDeleteOverride = (className, methodName, access) => {
+    setClassStructure(prevStructure => 
+      prevStructure.map(cls => {
+        if (cls.name === className) {
+          const updatedMethods = cls[access].methods.map(method => 
+            method.name === methodName ? {...method, inherited: true, definition: ''} : method
+          );
+          return {...cls, [access]: {...cls[access], methods: updatedMethods}};
+        }
+        return cls;
+      })
+    );
   };
 
   const deleteClass = (className) => {
     const classesToDelete = [className];
     const findDescendants = (parentName) => {
       classStructure.forEach(cls => {
-        if (cls.parent === parentName) {
+        if (cls.parents && cls.parents.some(parent => parent.name === parentName)) {
           classesToDelete.push(cls.name);
           findDescendants(cls.name);
         }
@@ -78,31 +129,34 @@ const ProjectPage = () => {
       prevStructure.filter(cls => !classesToDelete.includes(cls.name))
     );
   };
-  
 
   const generateCode = () => {
     return classStructure.map(classItem => {
       const classCode = [];
-    const inheritanceString = classItem.parents && classItem.parents.length > 0
-      ? ` : ${classItem.parents.map(parent => `${parent.inheritanceType} ${parent.name}`).join(', ')}`
-      : '';
-    classCode.push(`class ${classItem.name}${inheritanceString} {`);
+      const inheritanceString = classItem.parents && classItem.parents.length > 0
+        ? ` : ${classItem.parents.map(parent => `${parent.inheritanceType} ${parent.name}`).join(', ')}`
+        : '';
+      classCode.push(`class ${classItem.name}${inheritanceString} {`);
     
       ['public', 'protected', 'private'].forEach(access => {
         if (classItem[access].attributes.length > 0 || classItem[access].methods.length > 0) {
           classCode.push(`${access}:`);
           classItem[access].attributes.forEach(attr => {
-            classCode.push(`  ${attr.type} ${attr.name}${attr.defaultValue ? ` = ${attr.defaultValue}` : ''};`);
+            if (!attr.inherited) {
+              classCode.push(`  ${attr.type} ${attr.name}${attr.defaultValue ? ` = ${attr.defaultValue}` : ''};`);
+            }
           });
           classItem[access].methods.forEach(method => {
-            const signature = `${method.returnType} ${method.name}(${method.params.join(', ')})`;
-            classCode.push(`  ${signature} {`);
-            if (method.definition) {
-              classCode.push(method.definition.split('\n').map(line => `    ${line}`).join('\n'));
-            } else {
-              classCode.push('    // TODO: Implement method');
+            if (!method.inherited || method.definition) {
+              const signature = `${method.returnType} ${method.name}(${method.params.join(', ')})`;
+              classCode.push(`  ${signature} {`);
+              if (method.definition) {
+                classCode.push(method.definition.split('\n').map(line => `    ${line}`).join('\n'));
+              } else {
+                classCode.push('    // TODO: Implement method');
+              }
+              classCode.push('  }');
             }
-            classCode.push('  }');
           });
         }
       });
@@ -110,7 +164,8 @@ const ProjectPage = () => {
       classCode.push('};');
       return classCode.join('\n');
     }).join('\n\n');
-  };  
+  };
+
   const handleMouseDown = (e) => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
@@ -146,32 +201,25 @@ const ProjectPage = () => {
       alert('Failed to save project. Please try again.');
     }
   };
-  // console.log(projectId);
-  // localStorage.clear();
+
   return (
     <div className="flex h-screen">
       <div style={{ width: `${leftPanelWidth}px` }} className="flex-shrink-0 border-r border-gray-200 p-5 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 text-white">
         <br />
         <br />
-        {/* <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-          className="w-full p-2 mb-4 border border-gray-600 bg-gray-700 rounded-lg text-lg text-white"
-        >
-          <option value="cpp">C++</option>
-        </select> */}
-      <div className="mt-auto pt-4 border-t border-gray-700">
-        <h2 className="text-xl font-bold mb-2 text-blue-300">Project Name: {pName}</h2>
-        <p className="text-sm text-gray-300">Project Description: {pDesc}</p>
-      </div>
-      <br />
-      <hr />
-      <br />
+        <div className="mt-auto pt-4 border-t border-gray-700">
+          <h2 className="text-xl font-bold mb-2 text-blue-300">Project Name: {pName}</h2>
+          <p className="text-sm text-gray-300">Project Description: {pDesc}</p>
+        </div>
+        <br />
+        <hr />
+        <br />
         <ClassStructure
           structure={classStructure}
           onAddClass={handleAddClass}
           onUpdateClass={handleUpdateClass}
           onDeleteClass={deleteClass}
+          onDeleteOverride={handleDeleteOverride}
         />
       </div>
       <div
@@ -192,4 +240,3 @@ const ProjectPage = () => {
 };
 
 export default ProjectPage;
-

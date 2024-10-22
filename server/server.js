@@ -16,7 +16,7 @@ const app = express();
 
 // Middleware
 app.use(logger);
-app.use(cors({ origin: process.env.CLIENT_URL,  credentials: true }));
+app.use(cors({ origin: "https://codegen-x8vl.vercel.app",  credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

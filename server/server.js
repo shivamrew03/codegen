@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Connect to MongoDB
-connectDatabase();
+await connectDatabase();
 
 // Routes
 app.use('/api/auth', authRoutes);

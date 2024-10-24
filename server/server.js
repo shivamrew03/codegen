@@ -11,17 +11,17 @@ import errorHandler from './src/middleware/errorHandler.js';
 import logger from './src/middleware/logger.js';
 
 dotenv.config();
-const __dirname = path.resolve();
+// const __dirname = path.resolve();
 const app = express();
 
 // Middleware
 app.use(logger);
-app.use(cors({ origin: process.env.CLIENT_URL,  credentials: true }));
+app.use(cors({ origin: "https://codegen-x8vl.vercel.app",  credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
 // Connect to MongoDB
-connectDatabase();
+await connectDatabase();
 
 // Routes
 app.use('/api/auth', authRoutes);

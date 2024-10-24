@@ -12,7 +12,7 @@ const ProjectPage = () => {
     const savedStructure = localStorage.getItem('classStructure');
     return savedStructure ? JSON.parse(savedStructure) : [];
   });
-  
+
   const [language, setLanguage] = useState(() => {
     const savedLanguage = localStorage.getItem('language');
     return savedLanguage || 'cpp';
@@ -30,14 +30,14 @@ const ProjectPage = () => {
         setpDesc(fetchedDesc);
         setClassStructure(fetchedStructure || []);
         localStorage.setItem('classStructure', JSON.stringify(fetchedStructure || []));
-        
+
         setLanguage(fetchedCode ? 'cpp' : 'cpp');
         localStorage.setItem('language', fetchedCode ? 'cpp' : 'cpp');
       } catch (error) {
         console.error('Error fetching project:', error);
       }
     };
-  
+
     fetchProject();
   }, [projectId]);
 
@@ -51,11 +51,11 @@ const ProjectPage = () => {
     ['public', 'protected'].forEach(access => {
       parentClass[access].attributes.forEach(attr => {
         const newAccess = inheritanceType === 'public' ? access : inheritanceType;
-        inheritedMembers[newAccess].attributes.push({...attr, inherited: true});
+        inheritedMembers[newAccess].attributes.push({ ...attr, inherited: true });
       });
       parentClass[access].methods.forEach(method => {
         const newAccess = inheritanceType === 'public' ? access : inheritanceType;
-        inheritedMembers[newAccess].methods.push({...method, inherited: true});
+        inheritedMembers[newAccess].methods.push({ ...method, inherited: true });
       });
     });
 
@@ -94,19 +94,19 @@ const ProjectPage = () => {
   };
 
   const handleUpdateClass = (updatedClass) => {
-    setClassStructure(classStructure.map(cls => 
+    setClassStructure(classStructure.map(cls =>
       cls.name === updatedClass.name ? updatedClass : cls
     ));
   };
 
   const handleDeleteOverride = (className, methodName, access) => {
-    setClassStructure(prevStructure => 
+    setClassStructure(prevStructure =>
       prevStructure.map(cls => {
         if (cls.name === className) {
-          const updatedMethods = cls[access].methods.map(method => 
-            method.name === methodName ? {...method, inherited: true, definition: ''} : method
+          const updatedMethods = cls[access].methods.map(method =>
+            method.name === methodName ? { ...method, inherited: true, definition: '' } : method
           );
-          return {...cls, [access]: {...cls[access], methods: updatedMethods}};
+          return { ...cls, [access]: { ...cls[access], methods: updatedMethods } };
         }
         return cls;
       })
@@ -124,8 +124,8 @@ const ProjectPage = () => {
       });
     };
     findDescendants(className);
-    
-    setClassStructure(prevStructure => 
+
+    setClassStructure(prevStructure =>
       prevStructure.filter(cls => !classesToDelete.includes(cls.name))
     );
   };
@@ -137,7 +137,7 @@ const ProjectPage = () => {
         ? ` : ${classItem.parents.map(parent => `${parent.inheritanceType} ${parent.name}`).join(', ')}`
         : '';
       classCode.push(`class ${classItem.name}${inheritanceString} {`);
-    
+
       ['public', 'protected', 'private'].forEach(access => {
         if (classItem[access].attributes.length > 0 || classItem[access].methods.length > 0) {
           classCode.push(`${access}:`);
@@ -160,7 +160,7 @@ const ProjectPage = () => {
           });
         }
       });
-    
+
       classCode.push('};');
       return classCode.join('\n');
     }).join('\n\n');
@@ -170,16 +170,16 @@ const ProjectPage = () => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
-  
+
   const handleMouseMove = (e) => {
     setLeftPanelWidth(e.clientX);
   };
-  
+
   const handleMouseUp = () => {
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
   };
-  
+
   useEffect(() => {
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
@@ -227,7 +227,7 @@ const ProjectPage = () => {
         onMouseDown={handleMouseDown}
       />
       <div className="flex-grow mt-10 pt-10 flex flex-col overflow-hidden relative">
-        <button 
+        <button
           onClick={handleSave}
           className="absolute top-7 right-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
         >

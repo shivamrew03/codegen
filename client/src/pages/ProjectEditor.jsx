@@ -4,7 +4,7 @@ import api from '../services/api';
 import { toast } from 'react-toastify';
 
 const ProjectEditor = () => {
-  const [project, setProject] = useState({ name: '', description: '', content: '' });
+  const [project, setProject] = useState({ name: '', description: '', content: '' }); //content is not available in the new code. Change it.
   const { id } = useParams();
   const navigate = useNavigate();
 

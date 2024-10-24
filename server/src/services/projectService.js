@@ -5,8 +5,6 @@ export const getProjects = async (userId) => {
   return await Project.find({ user: userId });
 };
 
-
-
 export const createProject = async (userId, projectData) => {
   const project = new Project({
     name: projectData.name,
@@ -15,7 +13,6 @@ export const createProject = async (userId, projectData) => {
     code: projectData.code,
     user: userId,
   });
-  console.log(project);
   return await project.save();
 };
 
